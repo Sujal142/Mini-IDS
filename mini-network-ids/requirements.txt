@@ -1,0 +1,19 @@
+# Mini Network Intrusion Detection System (IDS) - Dependencies
+# Recommended Python version: 3.8 - 3.12
+
+# Web Framework and API
+flask>=2.3.0,<3.1.0
+
+# Network Packet Sniffing and Decoding
+# Note: On Windows, Npcap (https://npcap.com/) is required for live network capture.
+scapy>=2.5.0
+
+# Machine Learning & Data Processing (Optional Module)
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+joblib>=1.3.0
+
+# Plotting & CLI utilities (Optional for standalone scripts)
+matplotlib>=3.7.0
+requests>=2.31.0

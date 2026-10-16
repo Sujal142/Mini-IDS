@@ -1,0 +1,6 @@
+{
+  "name": "Mini Network Intrusion Detection System (IDS)",
+  "description": "An educational network intrusion detection system with real-time packet analysis, rule-based alerts, ML classification, and college lab viva documentation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

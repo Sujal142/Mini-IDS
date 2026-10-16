@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Network Intrusion Detection System (IDS) - SOC Dashboard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Chart.js for real-time visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen">
+  
+  <!-- Top Navigation / Header -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur px-6 py-4 sticky top-0 z-50 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="h-9 w-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-lg">
+        🛡️
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+          Mini Network Intrusion Detection System
+          <span class="text-xs px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 font-mono">B.Tech Mini-Project</span>
+        </h1>
+        <p class="text-xs text-slate-400">Rule-Based & ML Traffic Inspector • Educational Defensive SOC Lab</p>
+      </div>
+    </div>
+
+    <!-- System Status & Controls -->
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-full border border-slate-800 text-xs">
+        <span id="status-indicator" class="h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+        <span id="status-text" class="font-medium text-slate-300">IDLE (Stopped)</span>
+        <span id="mode-badge" class="ml-1 text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">LOCAL</span>
+      </div>
+
+      <button id="btn-start-sim" class="btn btn-primary" onclick="startMonitoring('simulated')">
+        ▶ Start Demo Simulation
+      </button>
+      <button id="btn-start-live" class="btn btn-outline" onclick="startMonitoring('live')">
+        🌐 Start Live Sniffer
+      </button>
+      <button id="btn-stop" class="btn btn-danger hidden" onclick="stopMonitoring()">
+        ⏹ Stop Monitoring
+      </button>
+      <button class="btn btn-secondary" onclick="exportAlertsCSV()">
+        📥 Export CSV
+      </button>
+      <button class="btn btn-ghost" onclick="clearData()" title="Clear database logs">
+        🧹 Clear
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="p-6 max-w-7xl mx-auto space-y-6">
+
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="card p-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Packets Captured</p>
+            <h3 id="stat-total-packets" class="text-2xl font-bold text-white mt-1">0</h3>
+          </div>
+          <span class="text-xl p-2 rounded-lg bg-blue-500/10 text-blue-400">📦</span>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-2">Parsed TCP/UDP/DNS/ICMP</p>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Threat Alerts</p>
+            <h3 id="stat-total-alerts" class="text-2xl font-bold text-rose-400 mt-1">0</h3>
+          </div>
+          <span class="text-xl p-2 rounded-lg bg-rose-500/10 text-rose-400">🚨</span>
+        </div>
+        <div class="flex items-center gap-2 mt-2 text-[11px]">
+          <span class="text-rose-400 font-semibold" id="stat-high-alerts">0 High</span> •
+          <span class="text-amber-400 font-semibold" id="stat-med-alerts">0 Med</span> •
+          <span class="text-blue-400 font-semibold" id="stat-low-alerts">0 Low</span>
+        </div>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Active Host IPs</p>
+            <h3 id="stat-unique-ips" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
+          </div>
+          <span class="text-xl p-2 rounded-lg bg-emerald-500/10 text-emerald-400">🖥️</span>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-2">Monitored source addresses</p>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Detection Engine</p>
+            <h3 class="text-2xl font-bold text-indigo-400 mt-1">4 Rules + ML</h3>
+          </div>
+          <span class="text-xl p-2 rounded-lg bg-indigo-500/10 text-indigo-400">⚡</span>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-2">Deduplicated Stateful Windows</p>
+      </div>
+    </div>
+
+    <!-- Interactive Demonstration Attacks Bar -->
+    <div class="card p-4 bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 border-indigo-900/40 flex flex-wrap items-center justify-between gap-4">
+      <div class="space-y-1">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+          <span>🧪</span> Mini-Project Interactive Attack Injection Console
+        </h2>
+        <p class="text-xs text-slate-400">
+          Inject safe synthetic attack scenarios on localhost to demonstrate specific detection rules firing live:
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button class="btn btn-sm btn-attack" onclick="injectScenario('port_scan')">
+          🔍 Rule 1: Port Scan Probe
+        </button>
+        <button class="btn btn-sm btn-attack" onclick="injectScenario('burst')">
+          💥 Rule 2: Request Burst (DoS)
+        </button>
+        <button class="btn btn-sm btn-attack" onclick="injectScenario('malformed')">
+          🎄 Rule 3: Xmas/Null Stealth Flags
+        </button>
+        <button class="btn btn-sm btn-attack" onclick="injectScenario('repeated_syn')">
+          🔄 Rule 4: Repeated SYN Attempt
+        </button>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Traffic Over Time -->
+      <div class="card p-4 lg:col-span-2">
+        <h3 class="text-sm font-semibold text-white mb-2 flex items-center justify-between">
+          <span>📈 Traffic Activity & Ingestion Rate</span>
+          <span class="text-xs text-slate-400 font-normal">Packets / 3s Interval</span>
+        </h3>
+        <div class="h-64">
+          <canvas id="chart-traffic"></canvas>
+        </div>
+      </div>
+
+      <!-- Protocol & Severity Distributions -->
+      <div class="card p-4 space-y-4">
+        <h3 class="text-sm font-semibold text-white">📊 Protocol & Threat Breakdown</h3>
+        <div class="h-56">
+          <canvas id="chart-protocols"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Alerts Feed -->
+    <div class="card p-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+        <div class="flex items-center gap-2">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            🚨 Security Alert Feed
+            <span id="alert-badge-count" class="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-mono">0 alerts</span>
+          </h3>
+        </div>
+        <!-- Filters -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <select id="filter-severity" class="form-select" onchange="loadAlerts()">
+            <option value="ALL">All Severities</option>
+            <option value="HIGH">High Severity</option>
+            <option value="MEDIUM">Medium Severity</option>
+            <option value="LOW">Low Severity</option>
+          </select>
+          <input id="filter-ip" type="text" placeholder="Filter by IP..." class="form-input" onkeyup="loadAlerts()">
+        </div>
+      </div>
+
+      <!-- Alerts Table -->
+      <div class="overflow-x-auto max-h-80 overflow-y-auto rounded border border-slate-800">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/80 text-slate-400 sticky top-0 border-b border-slate-800 font-medium">
+            <tr>
+              <th class="py-2.5 px-3">Time</th>
+              <th class="py-2.5 px-3">Severity</th>
+              <th class="py-2.5 px-3">Detection Rule</th>
+              <th class="py-2.5 px-3">Attacker IP</th>
+              <th class="py-2.5 px-3">Target</th>
+              <th class="py-2.5 px-3">Reason & Threshold Observation</th>
+              <th class="py-2.5 px-3">Type</th>
+            </tr>
+          </thead>
+          <tbody id="alerts-tbody" class="divide-y divide-slate-800/60 font-mono">
+            <tr>
+              <td colspan="7" class="py-6 text-center text-slate-500">No security alerts triggered yet. Run an attack scenario above or start live capture.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Live Captured Packets Table -->
+    <div class="card p-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          📋 Packet Inspection Stream
+          <span class="text-xs font-normal text-slate-400">(Latest 50 Captured Packets)</span>
+        </h3>
+        <div class="flex items-center gap-2 text-xs">
+          <select id="filter-packet-proto" class="form-select" onchange="loadPackets()">
+            <option value="ALL">All Protocols</option>
+            <option value="TCP">TCP</option>
+            <option value="UDP">UDP</option>
+            <option value="DNS">DNS</option>
+            <option value="ICMP">ICMP</option>
+          </select>
+          <button class="btn btn-xs btn-outline" onclick="loadPackets()">🔄 Refresh</button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto max-h-72 overflow-y-auto rounded border border-slate-800">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-900/80 text-slate-400 sticky top-0 border-b border-slate-800 font-medium">
+            <tr>
+              <th class="py-2.5 px-3">Timestamp</th>
+              <th class="py-2.5 px-3">Source IP : Port</th>
+              <th class="py-2.5 px-3">Destination IP : Port</th>
+              <th class="py-2.5 px-3">Protocol</th>
+              <th class="py-2.5 px-3">Length</th>
+              <th class="py-2.5 px-3">TCP Flags</th>
+              <th class="py-2.5 px-3">Packet Info</th>
+            </tr>
+          </thead>
+          <tbody id="packets-tbody" class="divide-y divide-slate-800/60 font-mono">
+            <tr>
+              <td colspan="7" class="py-6 text-center text-slate-500">No packets logged yet. Click Start Monitoring above.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Machine Learning Anomaly Inspector & Lab Verification Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- ML Inspector -->
+      <div class="card p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            🤖 ML Flow Anomaly Classifier
+          </h3>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-mono">RandomForest</span>
+        </div>
+        <p class="text-xs text-slate-400">
+          Enter flow characteristics observed over a time window to test the ML anomaly classifier and examine prediction confidence:
+        </p>
+
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div>
+            <label class="block text-slate-400 mb-1">Packets in Window</label>
+            <input id="ml-pkts" type="number" class="form-input w-full" value="48">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Unique Dst Ports</label>
+            <input id="ml-ports" type="number" class="form-input w-full" value="12">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Avg Packet Length (B)</label>
+            <input id="ml-len" type="number" class="form-input w-full" value="64">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">SYN Attempt Count</label>
+            <input id="ml-syns" type="number" class="form-input w-full" value="20">
+          </div>
+        </div>
+
+        <button class="btn btn-primary w-full text-xs" onclick="evaluateMLFlow()">
+          🧠 Evaluate Flow Anomaly
+        </button>
+
+        <div id="ml-result-box" class="p-3 rounded-lg border border-slate-800 bg-slate-950/80 text-xs space-y-1 hidden">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Model Classification:</span>
+            <span id="ml-pred-label" class="font-bold px-2 py-0.5 rounded">--</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Confidence Score:</span>
+            <span id="ml-confidence" class="font-mono font-bold text-white">--</span>
+          </div>
+          <div class="text-[11px] text-slate-500 pt-1" id="ml-model-status">--</div>
+        </div>
+      </div>
+
+      <!-- Wireshark Verification & College Lab Guide -->
+      <div class="card p-5 space-y-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          🦈 Wireshark Cross-Verification Guide
+        </h3>
+        <p class="text-xs text-slate-400">
+          Students can inspect identical network interfaces in Wireshark and compare filter results with this IDS:
+        </p>
+        <ul class="text-xs space-y-2 text-slate-300">
+          <li class="flex items-start gap-2">
+            <code class="px-1.5 py-0.5 bg-slate-950 border border-slate-800 text-emerald-400 font-mono rounded">tcp.flags.syn == 1 && tcp.flags.ack == 0</code>
+            <span>Filter pure connection attempts (Port scans &amp; SYN probes)</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <code class="px-1.5 py-0.5 bg-slate-950 border border-slate-800 text-emerald-400 font-mono rounded">ip.addr == 192.168.1.99</code>
+            <span>Track packets originating from suspicious scanner IP</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <code class="px-1.5 py-0.5 bg-slate-950 border border-slate-800 text-emerald-400 font-mono rounded">tcp.flags == 0x029</code>
+            <span>Verify Xmas scan flag combination (FIN, PSH, URG active)</span>
+          </li>
+        </ul>
+        <div class="pt-2 border-t border-slate-800 text-[11px] text-slate-500 flex justify-between items-center">
+          <span>College submission documentation ready in <code class="text-slate-400">docs/</code></span>
+          <span class="text-emerald-400 font-medium">✓ Defensive Lab Ready</span>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

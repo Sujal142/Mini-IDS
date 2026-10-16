@@ -1,0 +1,179 @@
+/* Mini Network Intrusion Detection System (IDS) - Dashboard Stylesheet */
+
+:root {
+  --bg-primary: #020617;
+  --bg-surface: #0f172a;
+  --bg-card: #1e293b;
+  --border-color: #334155;
+  --accent-cyan: #06b6d4;
+  --accent-emerald: #10b981;
+  --accent-rose: #f43f5e;
+  --accent-amber: #f59e0b;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Card Container */
+.card {
+  background-color: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  border-color: #475569;
+}
+
+/* Form Inputs & Selects */
+.form-input, .form-select {
+  background-color: #020617;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  outline: none;
+  font-size: 0.75rem;
+  transition: border-color 0.15s ease;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 1px #38bdf8;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  gap: 0.35rem;
+}
+
+.btn-primary {
+  background-color: #0284c7;
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background-color: #0369a1;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+.btn-outline:hover {
+  background-color: #1e293b;
+  border-color: #64748b;
+}
+
+.btn-danger {
+  background-color: #e11d48;
+  color: #ffffff;
+}
+.btn-danger:hover {
+  background-color: #be123c;
+}
+
+.btn-secondary {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+.btn-secondary:hover {
+  background-color: #334155;
+  color: #ffffff;
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: #94a3b8;
+}
+.btn-ghost:hover {
+  background-color: #1e293b;
+  color: #ffffff;
+}
+
+.btn-sm {
+  font-size: 0.72rem;
+  padding: 0.3rem 0.65rem;
+}
+
+.btn-xs {
+  font-size: 0.68rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.btn-attack {
+  background-color: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #c7d2fe;
+}
+.btn-attack:hover {
+  background-color: rgba(99, 102, 241, 0.25);
+  border-color: rgba(129, 140, 248, 0.6);
+  color: #ffffff;
+}
+
+/* Badges */
+.badge-high {
+  background-color: rgba(244, 63, 94, 0.15);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: #fda4af;
+}
+
+.badge-med {
+  background-color: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fcd34d;
+}
+
+.badge-low {
+  background-color: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+}
+
+/* Protocol Badges */
+.badge-proto {
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+.badge-tcp { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+.badge-udp { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+.badge-dns { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+.badge-icmp { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
